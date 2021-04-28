@@ -13,6 +13,7 @@ class TaskWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+      padding: EdgeInsets.all(10),
       decoration: BoxDecoration(
           color: task.isCompleted ? Colors.green[100] : Colors.red[100],
           borderRadius: BorderRadius.circular(10)),
