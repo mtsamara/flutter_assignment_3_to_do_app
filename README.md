@@ -1,6 +1,6 @@
-# flutter_application_5_practice
+# flutter_application_5
 
-A new Flutter project.
+A new Flutter project (practice).
 
 ## Getting Started
 
