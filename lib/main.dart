@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_5_practice/data/DB/DBHelper.dart';
 import 'package:flutter_application_5_practice/data/Repository.dart';
 import 'package:flutter_application_5_practice/models/Task.dart';
 import 'package:flutter_application_5_practice/pages/AllTasksPage.dart';
@@ -41,23 +42,37 @@ class _MyHomePageState extends State<MyHomePage>
     with SingleTickerProviderStateMixin {
   int index = 0;
   TabController controller;
+  List<Task> tasks;
+
   @override
   void initState() {
     controller = TabController(length: 3, vsync: this);
   }
 
-  deleteTask(Task task) {
-    Repository.tasks.remove(task);
-    setState(() {});
+  insertTask(Task task) async {
+    await DBHelper.dbHelper.insertTask(task);
+    await getAllTasks();
   }
 
-  toggleTask(Task task) {
-    task.isCompleted = !task.isCompleted;
+  deleteTask(Task task) async {
+    await DBHelper.dbHelper.deleteTask(task.id);
+    await getAllTasks();
+  }
+
+  toggleTask(Task task) async {
+    await DBHelper.dbHelper.updateTask(task);
+    await getAllTasks();
+  }
+
+  getAllTasks() async {
+    List<Task> tasks = await DBHelper.dbHelper.getAllTasks();
+    this.tasks = tasks;
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    getAllTasks();
     return Scaffold(
       drawer: Drawer(
         child: Column(
@@ -129,24 +144,34 @@ class _MyHomePageState extends State<MyHomePage>
           ],
         ),*/
       ),
-      body: TabBarView(controller: controller, children: [
-        AllTasksPage(Repository.tasks, deleteTask, toggleTask),
-        CompletedTasksPage(Repository.tasks, deleteTask, toggleTask),
-        IncompletedTasksPage(Repository.tasks, deleteTask, toggleTask)
-      ]),
+      body: tasks == null
+          ? CircularProgressIndicator()
+          : tasks.isEmpty
+              ? Center(
+                  child: Text('You dont have any tasks!!!\nPleas Add tasks :)'))
+              : TabBarView(controller: controller, children: [
+                  AllTasksPage(this.tasks, deleteTask, toggleTask),
+                  CompletedTasksPage(this.tasks, deleteTask, toggleTask),
+                  IncompletedTasksPage(this.tasks, deleteTask, toggleTask)
+                ]),
       floatingActionButton: FloatingActionButton(
         tooltip: 'Add new To-Do item',
         child: Icon(Icons.add),
         onPressed: () {
           //controller.animateTo(0);
           Task newTask = Task(
-              id: '${Repository.tasks.length}',
+              //id: '${Repository.tasks.length}',
               title: 'New To-Do Item',
               description: 'A dynamically created new To-Do item!!',
-              isCompleted: false);
-          Repository.tasks.add(newTask);
-          setState(() {});
-          print(newTask);
+              isCompleted: true);
+          //Repository.tasks.add(newTask);
+          insertTask(newTask);
+          //print(newTask);
+          //DB
+          //DBHelper.connectToDB(); ==> private
+          //DBHelper.dbHelper.insertTask(newTask);
+          //print(DBHelper.dbHelper.deleteTask(8));
+          //DBHelper.dbHelper.deleteTask(8);
         },
       ),
       bottomNavigationBar: Container(

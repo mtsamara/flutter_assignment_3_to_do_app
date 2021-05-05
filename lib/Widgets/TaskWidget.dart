@@ -31,7 +31,7 @@ class TaskWidget extends StatelessWidget {
               fontWeight: FontWeight.bold),
         ),
         subtitle: Text(
-          task.description,
+          'task.description',
           textAlign: TextAlign.justify,
           style: TextStyle(fontSize: 12),
         ),
